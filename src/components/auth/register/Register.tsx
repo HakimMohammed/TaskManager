@@ -1,4 +1,75 @@
-export default function Register() {
+import { useState } from "react";
+import { useAuth } from "../../../providers/authProvider/authProvider";
+
+interface RegisterFormValues {
+  email: string;
+  password: string;
+  repeatPassword: string;
+}
+
+export default function Register(): JSX.Element {
+  const { signUp } = useAuth();
+  const [formError, setFormError] = useState<string>("");
+  const [formSubmitting, setFormSubmitting] = useState<boolean>(false);
+
+  const [formValues, setFormValues] = useState<RegisterFormValues>({
+    email: "",
+    password: "",
+    repeatPassword: "",
+  });
+
+  const validateForm = () => {
+    const { email, password, repeatPassword } = formValues;
+    
+    if (!email || !password || !repeatPassword) {
+      setFormError("Please fill in all fields.");
+      return false;
+    }
+
+    if (password.length < 6) {
+      setFormError("Password should be at least 6 characters.");
+      return false;
+    }
+  
+    if (password.trim() !== repeatPassword.trim()) {
+      setFormError("Passwords do not match.");
+      return false;
+    }
+  
+    return true;
+  };
+  
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!validateForm()) {      
+      return;
+    }
+
+    setFormSubmitting(true);
+    signUp(formValues.email, formValues.password)
+      .then(() => {
+        // Naigate to Home
+      })
+      .catch((error) => {
+        console.log(`🚀 ~ signup error`, error)
+        setFormError(error.message);
+      })
+      .finally(() => {
+        setFormSubmitting(false);
+      });
+  };
+
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setFormValues((prevValues) => ({
+      ...prevValues,
+      [name]: value,
+    }));
+  };
+
   return (
     <>
       <main>
@@ -18,58 +89,20 @@ export default function Register() {
                         </p>
                       </div>
 
-                      <form
-                        className="row g-3 needs-validation"
-                        noValidate
-                      >
-                        <div className="col-12">
-                          <label htmlFor="yourName" className="form-label">
-                            Your Name
-                          </label>
-                          <input
-                            type="text"
-                            name="name"
-                            className="form-control"
-                            id="yourName"
-                            required
-                          />
-                          <div className="invalid-feedback">
-                            Please, enter your name!
-                          </div>
-                        </div>
-
+                      <form className={`row g-3 needs-validation ${formError !== '' ? '' : 'was-validated'}`}  noValidate onSubmit={handleSubmit}>
                         <div className="col-12">
                           <label htmlFor="yourEmail" className="form-label">
                             Your Email
                           </label>
                           <input
+                            value={formValues.email}
                             type="email"
                             name="email"
                             className="form-control"
                             id="yourEmail"
                             required
+                            onChange={handleInputChange}
                           />
-                          <div className="invalid-feedback">
-                            Please enter a valid Email adddress!
-                          </div>
-                        </div>
-
-                        <div className="col-12">
-                          <label htmlFor="yourUsername" className="form-label">
-                            Username
-                          </label>
-                          <div className="input-group has-validation">
-                            <input
-                              type="text"
-                              name="username"
-                              className="form-control"
-                              id="yourUsername"
-                              required
-                            />
-                            <div className="invalid-feedback">
-                              Please choose a username.
-                            </div>
-                          </div>
                         </div>
 
                         <div className="col-12">
@@ -77,28 +110,45 @@ export default function Register() {
                             Password
                           </label>
                           <input
+                            value={formValues.password}
                             type="password"
                             name="password"
                             className="form-control"
                             id="yourPassword"
                             required
+                            onChange={handleInputChange}
+                          />
+                        </div>
+
+                        <div className="col-12">
+                          <label htmlFor="repeatPassword" className="form-label">
+                            Confirm Password
+                          </label>
+                          <input
+                          value={formValues.repeatPassword}
+                            type="password"
+                            name="repeatPassword"
+                            className="form-control"
+                            id="repeatPassword"
+                            required
+                            onChange={handleInputChange}
                           />
                           <div className="invalid-feedback">
-                            Please enter your password!
+                            {formError}
                           </div>
                         </div>
                         <div className="col-12">
                           <button
                             className="btn btn-primary w-100"
                             type="submit"
+                            disabled={formSubmitting}
                           >
-                            Create Account
+                            {formSubmitting ? "Creating Account..." : "Create Account"}
                           </button>
                         </div>
                         <div className="col-12">
                           <p className="small mb-0">
-                            Already have an account?{" "}
-                            <a href="pages-login.html">Log in</a>
+                            Already have an account? <a>Log in</a>
                           </p>
                         </div>
                       </form>
@@ -110,12 +160,6 @@ export default function Register() {
           </section>
         </div>
       </main>
-      <a
-        href="#"
-        className="back-to-top d-flex align-items-center justify-content-center"
-      >
-        <i className="bi bi-arrow-up-short"></i>
-      </a>
     </>
   );
 }

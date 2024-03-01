@@ -1,4 +1,67 @@
+import { useState } from "react";
+import { useAuth } from "../../../providers/authProvider/authProvider";
+
+interface LoginFormValues {
+  email: string;
+  password: string;
+}
 export default function Login() {
+  const { signIn } = useAuth();
+  const [formError, setFormError] = useState<string>("");
+  const [formSubmitting, setFormSubmitting] = useState<boolean>(false);
+
+  const [formValues, setFormValues] = useState<LoginFormValues>({
+    email: "",
+    password: "",
+  });
+
+  const validateForm = () => {
+    const { email, password } = formValues;
+
+    if (!email || !password) {
+      setFormError("Please fill in all fields.");
+      return false;
+    }
+
+    if (password.length < 6) {
+      setFormError("Password should be at least 6 characters.");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setFormSubmitting(true);
+    signIn(formValues.email, formValues.password)
+      .then(() => {
+        console.log(`🚀 ~ signed in`);
+
+        // Naigate to Home
+      })
+      .catch((error) => {
+        console.log(`🚀 ~ signin error`, error);
+        setFormError(error.message);
+      })
+      .finally(() => {
+        setFormSubmitting(false);
+      });
+  };
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setFormValues((prevValues) => ({
+      ...prevValues,
+      [name]: value,
+    }));
+  };
+
   return (
     <>
       <main>
@@ -18,29 +81,26 @@ export default function Login() {
                         </p>
                       </div>
 
-                      <form className="row g-3 needs-validation" noValidate>
+                      <form
+                        className={`row g-3 needs-validation ${
+                          formError !== "" ? "" : "was-validated"
+                        }`}
+                        noValidate
+                        onSubmit={handleSubmit}
+                      >
                         <div className="col-12">
-                          <label htmlFor="yourUsername" className="form-label">
-                            Username
+                          <label htmlFor="yourEmail" className="form-label">
+                            Your Email
                           </label>
-                          <div className="input-group has-validation">
-                            <span
-                              className="input-group-text"
-                              id="inputGroupPrepend"
-                            >
-                              @
-                            </span>
-                            <input
-                              type="text"
-                              name="username"
-                              className="form-control"
-                              id="yourUsername"
-                              required
-                            />
-                            <div className="invalid-feedback">
-                              Please enter your username.
-                            </div>
-                          </div>
+                          <input
+                            value={formValues.email}
+                            type="email"
+                            name="email"
+                            className="form-control"
+                            id="yourEmail"
+                            required
+                            onChange={handleInputChange}
+                          />
                         </div>
 
                         <div className="col-12">
@@ -48,40 +108,23 @@ export default function Login() {
                             Password
                           </label>
                           <input
+                            value={formValues.password}
                             type="password"
                             name="password"
                             className="form-control"
                             id="yourPassword"
                             required
+                            onChange={handleInputChange}
                           />
-                          <div className="invalid-feedback">
-                            Please enter your password!
-                          </div>
                         </div>
 
-                        <div className="col-12">
-                          <div className="form-check">
-                            <input
-                              className="form-check-input"
-                              type="checkbox"
-                              name="remember"
-                              value="true"
-                              id="rememberMe"
-                            />
-                            <label
-                              className="form-check-label"
-                              htmlFor="rememberMe"
-                            >
-                              Remember me
-                            </label>
-                          </div>
-                        </div>
                         <div className="col-12">
                           <button
                             className="btn btn-primary w-100"
                             type="submit"
+                            disabled={formSubmitting}
                           >
-                            Login
+                            {formSubmitting ? "Loging in..." : "Login"}
                           </button>
                         </div>
                         <div className="col-12">
@@ -99,13 +142,6 @@ export default function Login() {
           </section>
         </div>
       </main>
-
-      <a
-        href="#"
-        className="back-to-top d-flex align-items-center justify-content-center"
-      >
-        <i className="bi bi-arrow-up-short"></i>
-      </a>
     </>
   );
 }
