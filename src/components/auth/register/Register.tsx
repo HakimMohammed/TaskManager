@@ -9,7 +9,6 @@ interface RegisterFormValues {
 
 export default function Register(): JSX.Element {
   const { signUp } = useAuth();
-  const [formError, setFormError] = useState<string>("");
   const [formSubmitting, setFormSubmitting] = useState<boolean>(false);
 
   const [formValues, setFormValues] = useState<RegisterFormValues>({
@@ -18,49 +17,28 @@ export default function Register(): JSX.Element {
     repeatPassword: "",
   });
 
-  const validateForm = () => {
-    const { email, password, repeatPassword } = formValues;
-    
-    if (!email || !password || !repeatPassword) {
-      setFormError("Please fill in all fields.");
-      return false;
-    }
-
-    if (password.length < 6) {
-      setFormError("Password should be at least 6 characters.");
-      return false;
-    }
-  
-    if (password.trim() !== repeatPassword.trim()) {
-      setFormError("Passwords do not match.");
-      return false;
-    }
-  
-    return true;
-  };
-  
-
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const form = event.currentTarget;
 
-    if (!validateForm()) {      
+    if (!form.checkValidity()) {
+      event.stopPropagation();
+      form.classList.add("was-validated");
+      setFormSubmitting(false);
       return;
     }
-
     setFormSubmitting(true);
     signUp(formValues.email, formValues.password)
       .then(() => {
         // Naigate to Home
       })
       .catch((error) => {
-        console.log(`🚀 ~ signup error`, error)
-        setFormError(error.message);
+        console.log(`🚀 ~ signup error`, error);
       })
       .finally(() => {
         setFormSubmitting(false);
       });
   };
-
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -89,7 +67,11 @@ export default function Register(): JSX.Element {
                         </p>
                       </div>
 
-                      <form className={`row g-3 needs-validation ${formError !== '' ? '' : 'was-validated'}`}  noValidate onSubmit={handleSubmit}>
+                      <form
+                        className="row g-3 needs-validation"
+                        noValidate
+                        onSubmit={handleSubmit}
+                      >
                         <div className="col-12">
                           <label htmlFor="yourEmail" className="form-label">
                             Your Email
@@ -101,8 +83,10 @@ export default function Register(): JSX.Element {
                             className="form-control"
                             id="yourEmail"
                             required
+                            pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$"
                             onChange={handleInputChange}
                           />
+                          <div className="invalid-feedback">Email Invalid!</div>
                         </div>
 
                         <div className="col-12">
@@ -116,25 +100,40 @@ export default function Register(): JSX.Element {
                             className="form-control"
                             id="yourPassword"
                             required
+                            pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
                             onChange={handleInputChange}
                           />
+                          <div className="invalid-feedback">
+                            Must contain:
+                            <br />
+                            - at least one number
+                            <br />
+                            - at least one uppercase letter
+                            <br />
+                            - at least one lowercase letter
+                            <br />- at least 8 characters
+                          </div>
                         </div>
 
                         <div className="col-12">
-                          <label htmlFor="repeatPassword" className="form-label">
+                          <label
+                            htmlFor="repeatPassword"
+                            className="form-label"
+                          >
                             Confirm Password
                           </label>
                           <input
-                          value={formValues.repeatPassword}
+                            value={formValues.repeatPassword}
                             type="password"
                             name="repeatPassword"
                             className="form-control"
                             id="repeatPassword"
                             required
+                            pattern={formValues.password}
                             onChange={handleInputChange}
                           />
                           <div className="invalid-feedback">
-                            {formError}
+                            Passwords don't match!
                           </div>
                         </div>
                         <div className="col-12">
@@ -143,7 +142,9 @@ export default function Register(): JSX.Element {
                             type="submit"
                             disabled={formSubmitting}
                           >
-                            {formSubmitting ? "Creating Account..." : "Create Account"}
+                            {formSubmitting
+                              ? "Creating Account..."
+                              : "Create Account"}
                           </button>
                         </div>
                         <div className="col-12">

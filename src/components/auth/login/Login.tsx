@@ -7,37 +7,22 @@ interface LoginFormValues {
 }
 export default function Login() {
   const { signIn } = useAuth();
-  const [formError, setFormError] = useState<string>("");
   const [formSubmitting, setFormSubmitting] = useState<boolean>(false);
-
   const [formValues, setFormValues] = useState<LoginFormValues>({
     email: "",
     password: "",
   });
 
-  const validateForm = () => {
-    const { email, password } = formValues;
-
-    if (!email || !password) {
-      setFormError("Please fill in all fields.");
-      return false;
-    }
-
-    if (password.length < 6) {
-      setFormError("Password should be at least 6 characters.");
-      return false;
-    }
-
-    return true;
-  };
-
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const form = event.currentTarget;
 
-    if (!validateForm()) {
+    if (!form.checkValidity()) {
+      event.stopPropagation();
+      form.classList.add("was-validated");
+      setFormSubmitting(false);
       return;
     }
-
     setFormSubmitting(true);
     signIn(formValues.email, formValues.password)
       .then(() => {
@@ -47,7 +32,6 @@ export default function Login() {
       })
       .catch((error) => {
         console.log(`🚀 ~ signin error`, error);
-        setFormError(error.message);
       })
       .finally(() => {
         setFormSubmitting(false);
@@ -82,9 +66,7 @@ export default function Login() {
                       </div>
 
                       <form
-                        className={`row g-3 needs-validation ${
-                          formError !== "" ? "" : "was-validated"
-                        }`}
+                        className="row g-3 needs-validation"
                         noValidate
                         onSubmit={handleSubmit}
                       >
@@ -99,8 +81,10 @@ export default function Login() {
                             className="form-control"
                             id="yourEmail"
                             required
+                            pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$"
                             onChange={handleInputChange}
                           />
+                          <div className="invalid-feedback">Email Invalid!</div>
                         </div>
 
                         <div className="col-12">
@@ -114,8 +98,19 @@ export default function Login() {
                             className="form-control"
                             id="yourPassword"
                             required
+                            pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
                             onChange={handleInputChange}
                           />
+                          <div className="invalid-feedback">
+                            Must contain:
+                            <br />
+                            - at least one number
+                            <br />
+                            - at least one uppercase letter
+                            <br />
+                            - at least one lowercase letter
+                            <br />- at least 8 characters
+                          </div>
                         </div>
 
                         <div className="col-12">
