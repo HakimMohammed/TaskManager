@@ -28,7 +28,7 @@ export const UserStateContext = createContext<UserStateContext>(
 
 export interface AuthContext {
     auth: Auth,
-    user: User | null,
+    currentUser: User | null,
     signIn: (email: string, password: string) => Promise<UserCredential>
     signUp: (email: string, password: string) => Promise<UserCredential>
 }
@@ -46,7 +46,7 @@ export interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps): JSX.Element => {
-    const [user, setUser] = useState<User |null>(null)
+    const [currentUser, setCurrentUser] = useState<User |null>(null)
 
     function signUp(email: string, password: string): Promise<UserCredential> {
         return createUserWithEmailAndPassword(auth, email, password);
@@ -58,7 +58,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): JSX.Element => {
 
     useEffect(()=>{
         const unsibscribe = auth.onAuthStateChanged((user) => {
-            setUser(user)
+            setCurrentUser(user)
         });
 
         return unsibscribe;
@@ -66,7 +66,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): JSX.Element => {
 
     const values = {
         signUp,
-        user,
+        currentUser,
         signIn,
         auth
     }

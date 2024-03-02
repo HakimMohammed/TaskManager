@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../../../providers/authProvider/authProvider";
+import { Link, Navigate } from "react-router-dom";
 
 interface RegisterFormValues {
   email: string;
@@ -30,7 +31,7 @@ export default function Register(): JSX.Element {
     setFormSubmitting(true);
     signUp(formValues.email, formValues.password)
       .then(() => {
-        // Naigate to Home
+        <Navigate to={"/home"} />;
       })
       .catch((error) => {
         console.log(`🚀 ~ signup error`, error);
@@ -149,7 +150,8 @@ export default function Register(): JSX.Element {
                         </div>
                         <div className="col-12">
                           <p className="small mb-0">
-                            Already have an account? <a>Log in</a>
+                            Already have an account?{" "}
+                            <Link to={"/sign-in"}>Login</Link>
                           </p>
                         </div>
                       </form>

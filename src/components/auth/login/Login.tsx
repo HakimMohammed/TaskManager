@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { useAuth } from "../../../providers/authProvider/authProvider";
+import { Link, useNavigate } from "react-router-dom";
 
 interface LoginFormValues {
   email: string;
   password: string;
 }
 export default function Login() {
+  const navigate = useNavigate();
   const { signIn } = useAuth();
   const [formSubmitting, setFormSubmitting] = useState<boolean>(false);
   const [formValues, setFormValues] = useState<LoginFormValues>({
@@ -27,8 +29,7 @@ export default function Login() {
     signIn(formValues.email, formValues.password)
       .then(() => {
         console.log(`🚀 ~ signed in`);
-
-        // Naigate to Home
+        navigate("/home");
       })
       .catch((error) => {
         console.log(`🚀 ~ signin error`, error);
@@ -84,7 +85,7 @@ export default function Login() {
                             pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$"
                             onChange={handleInputChange}
                           />
-                          <div className="invalid-feedback">Email Invalid!</div>
+                          <div className="invalid-feedback">Email invalid !</div>
                         </div>
 
                         <div className="col-12">
@@ -102,14 +103,7 @@ export default function Login() {
                             onChange={handleInputChange}
                           />
                           <div className="invalid-feedback">
-                            Must contain:
-                            <br />
-                            - at least one number
-                            <br />
-                            - at least one uppercase letter
-                            <br />
-                            - at least one lowercase letter
-                            <br />- at least 8 characters
+                            Password invalid !
                           </div>
                         </div>
 
@@ -125,7 +119,7 @@ export default function Login() {
                         <div className="col-12">
                           <p className="small mb-0">
                             Don't have account?{" "}
-                            <a href="pages-register.html">Create an account</a>
+                            <Link to={"/sign-up"}>Create an account</Link>
                           </p>
                         </div>
                       </form>
