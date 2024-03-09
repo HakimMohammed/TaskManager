@@ -1,4 +1,4 @@
-import React, { 
+import { 
     ReactNode,
     useEffect,
     useState,
@@ -31,6 +31,7 @@ export interface AuthContext {
     currentUser: User | null,
     signIn: (email: string, password: string) => Promise<UserCredential>
     signUp: (email: string, password: string) => Promise<UserCredential>
+    signOut: () => void
 }
 
 export const AuthContext = createContext<AuthContext>(
@@ -56,6 +57,10 @@ export const AuthProvider = ({ children }: AuthProviderProps): JSX.Element => {
         return signInWithEmailAndPassword(auth, email, password);
     }
 
+    const signOut = async () => {
+        await auth.signOut();
+    } 
+
     useEffect(()=>{
         const unsibscribe = auth.onAuthStateChanged((user) => {
             setCurrentUser(user)
@@ -68,7 +73,8 @@ export const AuthProvider = ({ children }: AuthProviderProps): JSX.Element => {
         signUp,
         currentUser,
         signIn,
-        auth
+        auth,
+        signOut
     }
 
     return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>

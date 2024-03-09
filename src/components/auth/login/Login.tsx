@@ -11,8 +11,8 @@ export default function Login() {
   const { signIn } = useAuth();
   const [formSubmitting, setFormSubmitting] = useState<boolean>(false);
   const [formValues, setFormValues] = useState<LoginFormValues>({
-    email: "",
-    password: "",
+    email: "admin@gmail.com",
+    password: "Password@123",
   });
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {

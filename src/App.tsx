@@ -4,6 +4,7 @@ import Register from "./components/auth/register/Register";
 import { AuthProvider } from "./providers/authProvider/authProvider";
 import PrivateRoute from "./routes/PrivateRoute";
 import Home from "./components/home/Home";
+import Error from "./components/error/Error";
 
 function App(): JSX.Element {
   return (
@@ -11,10 +12,11 @@ function App(): JSX.Element {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<PrivateRoute />}>
-            <Route path="/home" element={<Home />} />
+              <Route path="/home" element={<Home />} />
           </Route>
           <Route path="/sign-in" element={<Login />} />
           <Route path="/sign-up" element={<Register />} />
+          <Route path="*" element={<Error />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
