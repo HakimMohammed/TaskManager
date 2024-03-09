@@ -13,11 +13,12 @@ export default function Home() {
     setIsOpen(!isOpen);
   };
 
+
   return (
     <>
       <QueryClientProvider client={queryClient}>
         <div className={`${isOpen ? "" : "toggle-sidebar"}`}>
-          <Header close={toggleSidebar} />
+          <Header close={toggleSidebar}/>
           <Sidebar />
           <DataTable />
         </div>

@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../providers/authProvider/authProvider";
+import SearchBar from "./SearchBar";
 
 interface HeadeProps {
   close: () => void;
@@ -25,24 +26,7 @@ export default function Header({ close }: HeadeProps) {
         </Link>
         <i onClick={close} className="bi bi-list toggle-sidebar-btn"></i>
       </div>
-
-      <div className="search-bar">
-        <form
-          className="search-form d-flex align-items-center"
-          method="POST"
-          action="#"
-        >
-          <input
-            type="text"
-            name="query"
-            placeholder="Search"
-            title="Enter search keyword"
-          />
-          <button type="submit" title="Search">
-            <i className="bi bi-search"></i>
-          </button>
-        </form>
-      </div>
+      <SearchBar/>
 
       <nav className="header-nav ms-auto">
         <ul className="d-flex align-items-center">

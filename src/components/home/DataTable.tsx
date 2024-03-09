@@ -23,6 +23,7 @@ export default function DataTable() {
       });
     }
   }, [data, isPlaceholderData, page, currentUser.currentUser?.uid]);
+
   return (
     <main id="main" className="main">
       <section className="section">
@@ -37,7 +38,7 @@ export default function DataTable() {
               }}
             >
               <p
-                className="border-end border-start w-100 m-0"
+                className="border-end w-100 m-0"
                 style={{
                   color: "#012970",
                   fontSize: "15px",
@@ -88,9 +89,7 @@ export default function DataTable() {
                   className="d-flex justify-content-between align-items-center text-center p-3 rounded h-100"
                   style={{ border: "1px solid #ebeef4" }}
                 >
-                  <p className="border-end border-start w-100 m-0">
-                    {task.title}
-                  </p>
+                  <p className="border-end w-100 m-0">{task.title}</p>
                   <p className="border-end border-start w-100 m-0">
                     {task.description}
                   </p>
@@ -153,7 +152,10 @@ export default function DataTable() {
                 ),
               },
               (_, index) => (
-                <li key={index} className="page-item">
+                <li
+                  key={index}
+                  className={`page-item ${index + 1 === (data.prev ?? 0) + 1 ? "active": ""}`}
+                >
                   <button
                     className="page-link"
                     onClick={() => {

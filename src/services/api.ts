@@ -3,8 +3,9 @@ import Task from "../models/Task";
 
 export const fetchTasks = async (
   user: string,
-  page: number
-) : Promise<Response>=> {
+  page: number,
+
+): Promise<Response> => {
   const response = await fetch(
     `${process.env.REACT_APP_BASE_URL}/tasks?userId=${user}&_page=${page}&_per_page=${process.env.REACT_APP_LIMIT}_sort=priority`
   );
